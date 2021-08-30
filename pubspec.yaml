@@ -1,0 +1,12 @@
+name: easy_web
+description: A bunch of useful stuff for your Flutter web application.
+version: 0.1.0
+repository: https://github.com/robmllze/easy_web
+environment:
+  sdk: '>=2.12.0 <3.0.0'
+dependencies:
+  http: ^0.13.1 # https://pub.dev/packages/http
+  prep: ^0.3.2  # https://pub.dev/packages/prep
+  js: ^0.6.3 # https://pub.dev/packages/js
+dev_dependencies:
+  lints: ^1.0.1

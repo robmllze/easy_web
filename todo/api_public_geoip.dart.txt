@@ -1,0 +1,238 @@
+// ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+//
+// API PUBLIC GEOIP
+//
+// Coded by Robert Mollentze
+//
+// TODO ☝️ Update and test!
+//
+// ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+
+library easy_web;
+
+import 'package:rappid/mgr/mgr_http.dart';
+
+//
+//
+//
+
+import 'package:rappid/mgr/mgr_logs.dart';
+
+final Logger _l = Logger("api_public_geoip");
+
+// ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+class MyPublicGeoIp {
+  //
+  //
+  //
+
+  static final MyPublicGeoIp _singleton = MyPublicGeoIp._();
+  factory MyPublicGeoIp() => _singleton;
+  MyPublicGeoIp._();
+
+  //
+  //
+  //
+
+  Map<String, dynamic>? _all;
+  String? _asn;
+  String? _asnOrganisation;
+  String? _city;
+  String? _codeZip;
+  String? _country;
+  String? _codeCountry;
+  String? _ip;
+  String? _ipv4;
+  String? _ipv6;
+  double? _latitude;
+  double? _longitude;
+  String? _region;
+  String? _codeRegion;
+  String? _nameTimezone;
+
+  //
+  //
+  //
+
+  Map<String, dynamic>? get all => this._all;
+  String? get asn => this._asn;
+  String? get asnOrganisation => this._asnOrganisation;
+  String? get city => this._city;
+  String? get codeZip => this._codeZip;
+  String? get country => this._country;
+  String? get codeCountry => this._codeCountry;
+  String? get ip => this._ip;
+  String? get ipv4 => this._ipv4;
+  String? get ipv6 => this._ipv6;
+  double? get latitude => this._latitude;
+  double? get longitude => this._longitude;
+  String? get region => this._region;
+  String? get codeRegion => this._codeRegion;
+  String? get nameTimezone => this._nameTimezone;
+
+  // IF CONFIG
+  // ───────────────────────────────────────────────────────────────────────────
+
+  Future<bool> $tryIfConfig() {
+    return Future<bool>(() async {
+      this._all = await getBodyFields(Uri.https("ifconfig.co", "/json"));
+      if (this._all != null) {
+        this._asn = this._all!["asn"];
+        this._asnOrganisation = this._all!["asn_org"];
+        this._city = this._all!["city"];
+        this._codeZip = this._all!["zip_code"];
+        this._country = this._all!["country"];
+        this._codeCountry = this._all!["country_iso"];
+        this._ip = this._all!["ip"];
+        this._ipv4 = null;
+        this._ipv6 = this._all!["ip"];
+        this._latitude = this._all!["latitude"];
+        this._longitude = this._all!["longitude"];
+        this._region = this._all!["region_name"];
+        this._codeRegion = this._all!["region_code"];
+        this._nameTimezone = this._all!["time_zone"];
+        return true;
+      }
+      return false;
+    }).catchError((e) {
+      return false;
+    });
+  }
+
+  // SEE IP
+  // ───────────────────────────────────────────────────────────────────────────
+
+  Future<bool> $trySeeIp() {
+    return Future<bool>(() async {
+      this._all = await getBodyFields(Uri.https("ip6.seeip.org", "/geoip"));
+      if (this._all != null) {
+        this._asn = this._all!["asn"];
+        this._asnOrganisation = this._all!["organization"];
+        this._city = this._all!["city"];
+        this._codeZip = this._all!["postal_code"];
+        this._country = this._all!["country"];
+        this._codeCountry = this._all!["country_code"];
+        this._ip = this._all!["ip"];
+        this._ipv4 =
+            await getBodyField("ip", Uri.https("ip4.seeip.org", "/geoip"));
+        this._ipv6 = this._all!["ip"];
+        this._latitude = this._all!["latitude"];
+        this._longitude = this._all!["longitude"];
+        this._region = this._all!["region"];
+        this._codeRegion = this._all!["region_code"];
+        this._nameTimezone = this._all!["timezone"];
+        return true;
+      }
+      return false;
+    }).catchError((e) {
+      return false;
+    });
+  }
+
+  // IP API
+  // ───────────────────────────────────────────────────────────────────────────
+
+  Future<bool> $tryIpApi() {
+    return Future<bool>(() async {
+      this._all = await getBodyFields(Uri.https("ipapi.co", "/json"));
+      if (this._all != null) {
+        this._asn = this._all!["asn"];
+        this._asnOrganisation = this._all!["org"];
+        this._city = this._all!["city"];
+        this._codeZip = this._all!["postal"];
+        this._country = this._all!["country_name"];
+        this._codeCountry = this._all!["country_code"];
+        this._latitude = this._all!["latitude"];
+        this._longitude = this._all!["longitude"];
+        this._region = this._all!["region"];
+        this._codeRegion = this._all!["region_code"];
+        this._nameTimezone = this._all!["timezone"];
+        this._ip = this._all!["ip"];
+        this._ipv4 = null;
+        this._ipv6 = null;
+        final String? version = this._all!["version"];
+        if (version == "IPv4") this._ipv4 = this._all!["ip"];
+        if (version == "IPv6") this._ipv6 = this._all!["ip"];
+
+        return true;
+      }
+      return false;
+    }).catchError((e) {
+      return false;
+    });
+  }
+
+  // SOURCE: IP STACK
+  // ───────────────────────────────────────────────────────────────────────────
+
+  // Each free account allows 10K requests per month.
+  // Create more access keys here: https://ipstack.com/signup/free
+  // Create temp email here: https://temp-mail.org/en/
+  final List<String> _accessKeysIpStack = [
+    "d133ef7a81df785f2935da30b83df93e",
+    "8db9cf43242421b48d464f00eb70c661",
+    "0ccf975aab4cbba620ce06c54ee8287a",
+  ];
+
+  //
+  //
+  //
+
+  Future<bool> $tryIpStack(final String accessKey) {
+    return Future<bool>(() async {
+      this._all = await getBodyFields(Uri.https(
+          "api.ipstack.com/check", "/check", {"access_key": accessKey}));
+      if (this._all != null) {
+        this._asn = this._all!["connection"]["asn"];
+        this._asnOrganisation = this._all!["connection"]["isp"];
+        this._city = this._all!["city"];
+        this._codeZip = this._all!["zip"];
+        this._country = this._all!["country_name"];
+        this._codeCountry = this._all!["country_code"];
+        this._latitude = this._all!["latitude"];
+        this._longitude = this._all!["longitude"];
+        this._region = this._all!["region_name"];
+        this._codeRegion = this._all!["region_code"];
+        this._nameTimezone = this._all!["time_zone"]["id"];
+        this._ip = this._all!["ip"];
+        this._ipv4 = null;
+        this._ipv6 = null;
+        final String? type = this._all!["type"];
+        if (type == "ipv4") this._ipv4 = this._all!["ip"];
+        if (type == "ipv6") this._ipv6 = this._all!["ip"];
+        return true;
+      }
+      return false;
+    }).catchError((e) {
+      return false;
+    });
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
+
+  Future<bool> tryAll() {
+    return Future<bool>(() async {
+      bool res;
+      // Try IfConfig.
+      res = await this.$tryIfConfig();
+      if (res) return true;
+      // Try SeeIp.
+      res = await this.$trySeeIp();
+      if (res) return true;
+      // Try SeeIp.
+      res = await this.$tryIpApi();
+      if (res) return true;
+      // Try IpStack.
+      for (final String key in this._accessKeysIpStack) {
+        res = await this.$tryIpStack(key);
+        if (res) return true;
+      }
+      _l.err(
+        "tryAll",
+        "Failed to get public geo information. All sources failed.",
+      );
+      return false;
+    });
+  }
+}

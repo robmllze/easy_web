@@ -1,0 +1,458 @@
+// ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+//
+// API UTC NETWORK
+//
+// !!! Find at least 7 more sources before release (or use more API keys) and
+// try to find secure (HTTPS) sources.
+//
+// !!! Find out how to use time servers like time.google.com
+//
+// Coded by Robert Mollentze
+//
+// ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+
+library rappid;
+
+import 'dart:async';
+import 'dart:math';
+
+import 'package:rappid/mgr/mgr_http.dart';
+
+//
+//
+//
+
+import 'package:rappid/mgr/mgr_logs.dart';
+
+final Logger _l = Logger("api_utc_network");
+
+// ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+class UtcNetwork {
+  //
+  //
+  //
+
+  UtcNetwork._();
+
+  //
+  //
+  //
+
+  /// Source: http://api.timezonedb.com/v2.1/get-time-zone?key=TR5J6H6DU1T1&format=json&by=position&lat=64.128288&lng=-21.827774
+  ///
+  /// Notes:
+  /// - Unlimited requests but only one request per second allowed
+  /// - Premium is $5 a month (faster and more reliable network)
+  /// - Use https://temp-mail.org/ to create more accounts/API keys
+  static Future<DateTime?> $fetchA({
+    final List<String> apiKeys = const [
+      "TR5J6H6DU1T1",
+      "BBG7D3DQMIPH",
+      "O6SXAVEPZ20F",
+      "7JSJCEIP5PR9",
+      "8Z01J2WAMVPW",
+      "Z0PSJMGTZTBZ",
+      "EONM9DG2RLW2",
+      "6NA8ASO78OZM",
+      "GM3XSOYFTZDW",
+      "KW9CM31VUP33",
+    ],
+    // Reykjavik (UTC +00:00, no daylight savings).
+    final double latitude = 64.128288,
+    final double longitude = -21.827774,
+    final int timeoutSeconds = 5,
+  }) async {
+    final Timer timer = Timer.periodic(Duration(seconds: 1), (_) {});
+    return Future<DateTime?>(() async {
+      final int _length = apiKeys.length;
+      final int _p =
+          Random(DateTime.now().millisecondsSinceEpoch).nextInt(_length);
+      for (int n = 0; n < _length; n++) {
+        if (timer.tick >= timeoutSeconds) {
+          timer.cancel();
+          return null;
+        }
+        int _m = _p + n;
+        if (_m >= _length) _m -= _length;
+        final DateTime? res = await getBodyFields(
+            Uri.http("api.timezonedb.com", "/v2.1/get-time-zone", {
+          "key": apiKeys[_m],
+          "format": "json",
+          "by": "position",
+          "lat": latitude.toString(),
+          "lng": longitude.toString(),
+        })).then((Map<String, dynamic>? res) {
+          final String? _secondsSinceEpoch = res?["timestamp"]?.toString();
+          if (_secondsSinceEpoch != null) {
+            int? _millisecondsSinceEpoch = int.tryParse(_secondsSinceEpoch);
+            if (_millisecondsSinceEpoch != null) {
+              _millisecondsSinceEpoch *= 1000;
+              return DateTime.fromMillisecondsSinceEpoch(
+                  _millisecondsSinceEpoch,
+                  isUtc: true);
+            }
+          }
+          return null;
+        });
+        if (res != null) {
+          return res;
+        }
+      }
+      return null;
+    });
+  }
+
+  //
+  //
+  //
+
+  /// Source: http://api.aladhan.com/v1/currentTimestamp?zone=Atlantic/Reykjavik
+  static Future<DateTime?> $fetchB() async {
+    return await getBodyFields(
+        Uri.http("api.aladhan.com", "v1/currentTimestamp", {
+      "zone": "Atlantic/Reykjavik",
+    })).then((Map<String, dynamic>? res) {
+      final String? _code = res?["code"]?.toString();
+      if (_code == "200") {
+        final String? _secondsSinceEpoch = res?["data"]?.toString();
+        if (_secondsSinceEpoch != null) {
+          int? _millisecondsSinceEpoch = int.tryParse(_secondsSinceEpoch);
+          if (_millisecondsSinceEpoch != null) {
+            _millisecondsSinceEpoch *= 1000;
+            return DateTime.fromMillisecondsSinceEpoch(_millisecondsSinceEpoch,
+                isUtc: true);
+          }
+        }
+      }
+      return null;
+    });
+  }
+
+  //
+  //
+  //
+
+  // NB: Usually very very very busy!
+  /// Source: http://worldtimeapi.org/api/timezone/Atlantic/Reykjavik.json
+  static Future<DateTime?> $fetchC() async {
+    return await getBodyFields(Uri.http(
+      "worldtimeapi.org",
+      "/api/timezone/Atlantic/Reykjavik.json",
+    )).then((Map<String, dynamic>? res) {
+      final String? _secondsSinceEpoch = res?["unixtime"]?.toString();
+      if (_secondsSinceEpoch != null) {
+        int? _millisecondsSinceEpoch = int.tryParse(_secondsSinceEpoch);
+        if (_millisecondsSinceEpoch != null) {
+          _millisecondsSinceEpoch *= 1000;
+          return DateTime.fromMillisecondsSinceEpoch(_millisecondsSinceEpoch,
+              isUtc: true);
+        }
+      }
+
+      return null;
+    });
+  }
+
+  //
+  //
+  //
+
+  /// Source: http://worldclockapi.com/api/json/utc/now
+  static Future<DateTime?> $fetchD() async {
+    return await getBodyFields(
+            Uri.http("worldclockapi.com", "/api/json/utc/now"))
+        .then((Map<String, dynamic>? res) {
+      try {
+        final String? _currentDateTime = res?["currentDateTime"]?.toString();
+        final List<String?>? _dateTime = _currentDateTime?.split("T");
+        final List<String?>? _date = _dateTime?.first?.split("-");
+        final List<String?>? _time = _dateTime?.last?.split(":");
+        // Year.
+        final String? _year = _date?[0];
+        final int? _year0 = _year != null ? int.tryParse(_year) : null;
+        // Month.
+        final String? _month = _date?[1];
+        final int? _month0 = _month != null ? int.tryParse(_month) : null;
+        // Day.
+        final String? _day = _date?[2];
+        final int? _day0 = _day != null ? int.tryParse(_day) : null;
+        // Hour.
+        final String? _hour = _time?[0];
+        final int? _hour0 = _hour != null ? int.tryParse(_hour) : null;
+        // Minute.
+        final String? _minute = _time?[1]?.replaceAll(RegExp(r"Z"), "");
+        final int? _minute0 = _minute != null ? int.tryParse(_minute) : null;
+        return DateTime.utc(
+          _year0!,
+          _month0!,
+          _day0!,
+          _hour0!,
+          _minute0!,
+          // (seconds N/A from this source)
+        );
+      } catch (e) {
+        return null;
+      }
+    });
+  }
+
+  //
+  //
+  //
+
+  // TODO Finish!
+  // HTTPS :)
+  static Future<DateTime?> $fetchE() async {
+    // Source: https://www.amdoren.com/api/timezone.php?api_key=8EQE4LFfXszetFf5T7BATGbGCYcA5t&loc=Reykjavik
+    //
+    // - API key: 8EQE4LFfXszetFf5T7BATGbGCYcA5t
+    // - Use https://temp-mail.org/ to create more accounts/API keys
+    // - Parameter: "time" (e.g. "2021-04-12 06:29:04")
+  }
+
+  //
+  //
+  //
+
+  // TODO Finish!
+  // HTTPS :)
+  static Future<DateTime?> $fetchF() async {
+    // Source: https://api.ipgeolocation.io/timezone?apiKey=97793a02dc884b5bafae196e704413a7&tz=Atlantic/Reykjavik
+    //
+    // - API key: 97793a02dc884b5bafae196e704413a7
+    // - Needs Gmail to create account
+    // - 1000 requests per day with free account
+    // - Parameter: "date_time_unix"
+    // - Add algorithm to cycle through keys in a random order so that accounts
+    // get saturated uniformly
+  }
+
+  //
+  //
+  //
+
+  static Future<DateTime?> _fetch(
+      [final Duration timeout = const Duration(seconds: 5)]) {
+    return Future.any<DateTime?>([
+      Future.delayed(timeout, () => null),
+      UtcNetwork.$fetchA().then((DateTime? res) async =>
+          (res != null) ? res : await Future.delayed(timeout)),
+      UtcNetwork.$fetchB().then((DateTime? res) async =>
+          (res != null) ? res : await Future.delayed(timeout)),
+      UtcNetwork.$fetchC().then((DateTime? res) async =>
+          (res != null) ? res : await Future.delayed(timeout)),
+      UtcNetwork.$fetchD().then((DateTime? res) async =>
+          (res != null) ? res : await Future.delayed(timeout)),
+    ]);
+  }
+
+  //
+  //
+  //
+
+  static Future<DateTime?> _fetchSlow(
+      [final Duration timeout = const Duration(seconds: 5)]) {
+    return Future<DateTime?>(() async {
+      final DateTime? resA = await Future.any<DateTime?>([
+        Future.delayed(timeout, () => null),
+        UtcNetwork.$fetchA(),
+      ]);
+      if (resA != null) return resA;
+      final DateTime? resB = await Future.any<DateTime?>([
+        Future.delayed(timeout, () => null),
+        UtcNetwork.$fetchB(),
+      ]);
+      if (resB != null) return resB;
+      final DateTime? resC = await Future.any<DateTime?>([
+        Future.delayed(timeout, () => null),
+        UtcNetwork.$fetchC(),
+      ]);
+      if (resC != null) return resC;
+      final DateTime? resD = await Future.any<DateTime?>([
+        Future.delayed(timeout, () => null),
+        UtcNetwork.$fetchD(),
+      ]);
+      if (resD != null) return resD;
+      return null;
+    });
+  }
+
+  //
+  //
+  //
+
+  /// Starts comparing all possible pairs of time sources.
+  /// The average is returned of the first pair that matches (within
+  /// error [margin]).
+  /// If none match, null is returned.
+  static Future<DateTime?> _fetchSafest2({
+    final Duration timeout = const Duration(seconds: 5),
+    final Duration margin = const Duration(minutes: 2),
+  }) {
+    return Future<DateTime?>(() {
+      return Future.wait<DateTime?>([
+        Future.any<DateTime?>(
+            [UtcNetwork.$fetchA(), Future.delayed(timeout, () => null)]),
+        Future.any<DateTime?>(
+            [UtcNetwork.$fetchB(), Future.delayed(timeout, () => null)]),
+        Future.any<DateTime?>(
+            [UtcNetwork.$fetchC(), Future.delayed(timeout, () => null)]),
+        Future.any<DateTime?>(
+            [UtcNetwork.$fetchD(), Future.delayed(timeout, () => null)]),
+        Future<DateTime>(
+          () => DateTime.now().toUtc(),
+        ),
+      ]).then((List<DateTime?> res) {
+        for (int m = 0; m < res.length; m++) {
+          for (int n = 0; n < res.length; n++) {
+            if (m != n) {
+              if (res[m] != null && res[n] != null) {
+                final Duration dt = res[m]!.difference(res[n]!).abs();
+                if (dt <= margin) {
+                  return DateTime.fromMillisecondsSinceEpoch(
+                    (res[m]!.millisecondsSinceEpoch +
+                            res[n]!.millisecondsSinceEpoch) ~/
+                        2.0,
+                    isUtc: true,
+                  );
+                }
+              }
+            }
+          }
+        }
+        return null;
+      });
+    });
+  }
+
+  //
+  //
+  //
+
+  static Future<DateTime?> _fetchSafest3({
+    final Duration timeout = const Duration(seconds: 5),
+    final Duration margin = const Duration(minutes: 2),
+  }) {
+    return Future<DateTime?>(() {
+      return Future.wait([
+        Future.any<DateTime?>(
+            [UtcNetwork.$fetchA(), Future.delayed(timeout, () => null)]),
+        Future.any<DateTime?>(
+            [UtcNetwork.$fetchB(), Future.delayed(timeout, () => null)]),
+        Future.any<DateTime?>(
+            [UtcNetwork.$fetchC(), Future.delayed(timeout, () => null)]),
+        Future.any<DateTime?>(
+            [UtcNetwork.$fetchD(), Future.delayed(timeout, () => null)]),
+        // Future.any<DateTime?>([
+        //   // ...
+        //   Future.delayed(timeout, () => null)
+        // ]),
+        Future<DateTime>(
+          () => DateTime.now().toUtc(),
+        ),
+      ]).then((List<DateTime?> res) {
+        for (int m = 0; m < res.length; m++) {
+          for (int n = 0; n < res.length; n++) {
+            for (int p = 0; p < res.length; p++) {
+              if (m != n && m != p && p != n) {
+                if (res[m] != null && res[n] != null && res[p] != null) {
+                  final Duration dt0 = res[m]!.difference(res[n]!).abs();
+                  final Duration dt1 = res[n]!.difference(res[p]!).abs();
+                  final Duration dt2 = res[p]!.difference(res[n]!).abs();
+                  final Duration dtAverage = Duration(
+                      milliseconds: (dt0.inMilliseconds +
+                              dt1.inMilliseconds +
+                              dt2.inMilliseconds) ~/
+                          3.0);
+                  if (dtAverage <= margin) {
+                    return DateTime.fromMillisecondsSinceEpoch(
+                      (res[m]!.millisecondsSinceEpoch +
+                              res[n]!.millisecondsSinceEpoch +
+                              res[p]!.millisecondsSinceEpoch) ~/
+                          3.0,
+                      isUtc: true,
+                    );
+                  }
+                }
+              }
+            }
+          }
+        }
+        return null;
+      });
+    });
+  }
+
+  //
+  //
+  //
+
+  static Future<DateTime> now() async {
+    return UtcNetwork._fetch().then((final DateTime? res) {
+      if (res != null) {
+        return res;
+      }
+      _l.err(
+        "now",
+        "Failed to get network date/time. All sources failed/timed out. " +
+            "Using system time instead.",
+      );
+      return DateTime.now().toUtc();
+    });
+  }
+
+  //
+  //
+  //
+
+  static Future<DateTime> nowSlow() async {
+    return UtcNetwork._fetchSlow().then((final DateTime? res) {
+      if (res != null) {
+        return res;
+      }
+      _l.err(
+        "nowSlow",
+        "Failed to get network date/time. All sources failed/timed out. " +
+            "Using system time instead.",
+      );
+      return DateTime.now().toUtc();
+    });
+  }
+
+  //
+  //
+  //
+
+  static Future<DateTime> nowSafest2() async {
+    return UtcNetwork._fetchSafest2().then((final DateTime? res) {
+      if (res != null) {
+        return res;
+      }
+      _l.err(
+        "nowSafest2",
+        "Failed to get safest network date/time 2. All sources failed/timed out. " +
+            "Using system time instead.",
+      );
+      return DateTime.now().toUtc();
+    });
+  }
+
+  //
+  //
+  //
+
+  static Future<DateTime> nowSafest3() async {
+    return UtcNetwork._fetchSafest3().then((final DateTime? res) async {
+      if (res != null) {
+        return res;
+      }
+      _l.err(
+        "nowSafest3",
+        "Failed to get safest network date/time 3. " +
+            "Getting safest network date/time 2 instead...",
+      );
+      return UtcNetwork.nowSafest2();
+    });
+  }
+}
