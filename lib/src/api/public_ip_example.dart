@@ -1,25 +1,23 @@
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 //
-// URL UTILS
+// PUBLIC IP EXAMPLE
 //
 // <#Author = Robert Mollentze>
 // <#Date = 8/31/2021>
 //
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 
-library easy_web;
-
-import 'url_utils_js.dart' as js;
+import 'public_ip.dart';
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-void urlReplaceState({dynamic data, String? title, required String url}) =>
-    js.urlReplaceState(data, title, url);
-
-/// Hides query parameters from browser by deleting them from the history.
-void urlHideQueries() => js.urlReplaceState(null, null, "h");
-
-void urlPushState({dynamic data, String? title, required String url}) =>
-    js.urlPushState(data, title, url);
-
-void urlReplace({required String url}) => js.urlReplace(url);
+Future<void> main() async {
+  final _ip4 = await MyPublicIpv4.ip;
+  final _ipExpanded4 = await MyPublicIpv4.ipExpanded;
+  final _ip6 = await MyPublicIpv6.ip;
+  final _ipExpanded6 = await MyPublicIpv6.ipExpanded;
+  print("IPv4 Address: $_ip4\n"
+      "IPv4 Address Expanded: $_ipExpanded4\n"
+      "IPv6 Address: $_ip6\n"
+      "IPv6 Address Expanded: $_ipExpanded6\n");
+}

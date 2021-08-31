@@ -2,8 +2,8 @@
 //
 // CHECK CONNECTION
 //
-// <#Author=>
-// <#Date = 8/30/2021>
+// <#Author = Robert Mollentze>
+// <#Date = 8/31/2021>
 //
 // See check_connection.js
 //

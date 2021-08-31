@@ -1,25 +1,23 @@
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 //
-// URL UTILS
+// COOKIE
 //
 // <#Author = Robert Mollentze>
 // <#Date = 8/31/2021>
 //
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 
-library easy_web;
+import 'package:flutter/material.dart';
 
-import 'url_utils_js.dart' as js;
+import 'package:easy_web/src/cookie.dart';
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-void urlReplaceState({dynamic data, String? title, required String url}) =>
-    js.urlReplaceState(data, title, url);
-
-/// Hides query parameters from browser by deleting them from the history.
-void urlHideQueries() => js.urlReplaceState(null, null, "h");
-
-void urlPushState({dynamic data, String? title, required String url}) =>
-    js.urlPushState(data, title, url);
-
-void urlReplace({required String url}) => js.urlReplace(url);
+void main() {
+  final _success = setCookie("email", "test@test.test");
+  String _value = "n/a";
+  if (_success) {
+    _value = getCookie("email");
+  }
+  runApp(MaterialApp(home: Text("Cookie value is: $_value")));
+}

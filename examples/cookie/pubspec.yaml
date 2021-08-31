@@ -1,0 +1,11 @@
+name: cookie
+publish_to: 'none'
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+dependencies:
+  easy_web:
+    path: ../../
+  flutter:
+    sdk: flutter
+flutter:
+  uses-material-design: true

@@ -2,8 +2,8 @@
 //
 // READER URI QUERY
 //
-// <#Author=>
-// <#Date = 8/30/2021>
+// <#Author = Robert Mollentze>
+// <#Date = 8/31/2021>
 //
 // References:
 // - https://en.wikipedia.org/wiki/Uniform_Resource_Identifier

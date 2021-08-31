@@ -4,6 +4,7 @@ syntax_end: ">"
 syntax_sep: "="
 include_env: false
 update_these_fields: {
+  "Author": "Robert Mollentze"
 }
 parse_these_file_types: [
   "dart",

@@ -2,8 +2,8 @@
 //
 // COOKIE
 //
-// <#Author=>
-// <#Date = 8/30/2021>
+// <#Author = Robert Mollentze>
+// <#Date = 8/31/2021>
 //
 // Cookie Attributes:
 // - 'Domain': What domain may access the cookie such as: 'roowarded.com'
@@ -54,8 +54,8 @@ bool _areCookiesWorking() => window.navigator.cookieEnabled != null;
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-/// Returns value of cookie of `name` or an empty string if match is not found
-/// or an error occurs.
+/// Returns value of cookie `name` or an empty string if match is not found or
+/// an error occurs.
 ///
 /// Note: Does not throw exceptions.
 String getCookie(final String name) {

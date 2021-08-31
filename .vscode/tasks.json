@@ -1,0 +1,16 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "📘 Prep",
+            "type": "shell",
+            "command": "prep prep.yaml --path ./lib;prep prep.yaml --path ./examples/cookie/lib",
+        },
+        // More examples:
+        {
+            "label": "Run: public_ip_example.dart",
+            "type": "shell",
+            "command": "dart run ./lib/src/api/public_ip_example.dart",
+        },
+    ]
+}

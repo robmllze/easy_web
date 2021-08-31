@@ -1,0 +1,7 @@
+{
+    "start_url": ".",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": []
+}
